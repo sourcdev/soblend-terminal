@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soblend Terminal - Issue Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
+            color: #e0e0e0;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e1e1e, #2d2d2d);
+            padding: 30px 0;
+            border-bottom: 3px solid #00ff00;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #00ff00;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+        }
+
+        .header p {
+            color: #ccc;
+            font-size: 1.1rem;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+        }
+
+        .tab-btn {
+            background: #2a2a2a;
+            border: none;
+            color: #ccc;
+            padding: 15px 25px;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .tab-btn:hover {
+            background: #3a3a3a;
+            color: #00ff00;
+        }
+
+        .tab-btn.active {
+            background: #00ff00;
+            color: #000;
+            border-color: #00ff00;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 255, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #00ff00;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #ccc;
+            font-size: 1.1rem;
+        }
+
+        .form-container {
+            background: #1e1e1e;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #00ff00;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            background: #2a2a2a;
+            border: 2px solid #444;
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #00ff00;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+        }
+
+        .form-control.textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #00ff00, #00cc00);
+            color: #000;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #00cc00, #009900);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #666, #555);
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #777, #666);
+        }
+
+        .issues-container {
+            display: grid;
+            gap: 20px;
+        }
+
+        .issue-card {
+            background: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .issue-card:hover {
+            border-color: #00ff00;
+            box-shadow: 0 5px 20px rgba(0, 255, 0, 0.1);
+        }
+
+        .issue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .issue-title {
+            color: #00ff00;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .issue-meta {
+            display: flex;
+            gap: 15px;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .issue-status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-open {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border: 1px solid #ffc107;
+        }
+
+        .status-in-progress {
+            background: rgba(0, 123, 255, 0.2);
+            color: #007bff;
+            border: 1px solid #007bff;
+        }
+
+        .status-resolved {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+            border: 1px solid #28a745;
+        }
+
+        .status-closed {
+            background: rgba(108, 117, 125, 0.2);
+            color: #6c757d;
+            border: 1px solid #6c757d;
+        }
+
+        .priority-high {
+            color: #dc3545;
+        }
+
+        .priority-medium {
+            color: #ffc107;
+        }
+
+        .priority-low {
+            color: #28a745;
+        }
+
+        .issue-description {
+            color: #ccc;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .issue-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
+
+        .search-filter {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .search-filter input,
+        .search-filter select {
+            padding: 10px;
+            background: #2a2a2a;
+            border: 2px solid #444;
+            border-radius: 8px;
+            color: #e0e0e0;
+        }
+
+        .search-filter input {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #888;
+            font-size: 1.1rem;
+        }
+
+        .error {
+            background: rgba(220, 53, 69, 0.1);
+            border: 1px solid #dc3545;
+            color: #dc3545;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .success {
+            background: rgba(40, 167, 69, 0.1);
+            border: 1px solid #28a745;
+            color: #28a745;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: #1e1e1e;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            color: #00ff00;
+            font-size: 1.5rem;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #ccc;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .close-btn:hover {
+            color: #ff0000;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-filter {
+                flex-direction: column;
+            }
+            
+            .search-filter input {
+                min-width: auto;
+            }
+            
+            .issue-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .issue-meta {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1>🐛 Soblend Terminal Issue Tracker</h1>
+            <p>Report bugs, request features, and track development progress</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+            <button class="tab-btn" data-tab="issues">All Issues</button>
+            <button class="tab-btn" data-tab="create">Report Issue</button>
+            <button class="tab-btn" data-tab="analytics">Analytics</button>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="total-issues">0</div>
+                    <div class="stat-label">Total Issues</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="open-issues">0</div>
+                    <div class="stat-label">Open Issues</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="resolved-issues">0</div>
+                    <div class="stat-label">Resolved Issues</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="high-priority">0</div>
+                    <div class="stat-label">High Priority</div>
+                </div>
+            </div>
+
+            <h2 style="color: #00ff00; margin-bottom: 20px;">Recent Issues</h2>
+            <div id="recent-issues" class="issues-container">
+                <div class="loading">Loading recent issues...</div>
+            </div>
+        </div>
+
+        <!-- All Issues Tab -->
+        <div id="issues" class="tab-content">
+            <div class="search-filter">
+                <input type="text" id="search-input" placeholder="Search issues..." class="form-control">
+                <select id="status-filter" class="form-control">
+                    <option value="">All Status</option>
+                    <option value="open">Open</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="resolved">Resolved</option>
+                    <option value="closed">Closed</option>
+                </select>
+                <select id="priority-filter" class="form-control">
+                    <option value="">All Priority</option>
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                </select>
+                <select id="type-filter" class="form-control">
+                    <option value="">All Types</option>
+                    <option value="bug">Bug</option>
+                    <option value="feature">Feature Request</option>
+                    <option value="enhancement">Enhancement</option>
+                    <option value="documentation">Documentation</option>
+                </select>
+            </div>
+
+            <div id="all-issues" class="issues-container">
+                <div class="loading">Loading all issues...</div>
+            </div>
+        </div>
+
+                <!-- Create Issue Tab -->
+        <div id="create" class="tab-content">
+            <div class="form-container">
+                <h2 style="color: #00ff00; margin-bottom: 25px;">Report New Issue</h2>
+                
+                <div id="message-container"></div>
+                
+                <form id="issue-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="issue-title">Issue Title *</label>
+                            <input type="text" id="issue-title" name="title" class="form-control" required 
+                                   placeholder="Brief description of the issue">
+                        </div>
+                        <div class="form-group">
+                            <label for="issue-type">Issue Type *</label>
+                            <select id="issue-type" name="type" class="form-control" required>
+                                <option value="">Select Type</option>
+                                <option value="bug">🐛 Bug Report</option>
+                                <option value="feature">✨ Feature Request</option>
+                                <option value="enhancement">🚀 Enhancement</option>
+                                <option value="documentation">📚 Documentation</option>
+                                <option value="security">🔒 Security Issue</option>
+                                <option value="performance">⚡ Performance</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="issue-priority">Priority *</label>
+                            <select id="issue-priority" name="priority" class="form-control" required>
+                                <option value="">Select Priority</option>
+                                <option value="low">🟢 Low</option>
+                                <option value="medium">🟡 Medium</option>
+                                <option value="high">🔴 High</option>
+                                <option value="critical">🚨 Critical</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="issue-component">Component</label>
+                            <select id="issue-component" name="component" class="form-control">
+                                <option value="">Select Component</option>
+                                <option value="terminal">Terminal Interface</option>
+                                <option value="package-manager">Package Manager</option>
+                                <option value="settings">Settings</option>
+                                <option value="ui">User Interface</option>
+                                <option value="backend">Backend/API</option>
+                                <option value="security">Security</option>
+                                <option value="installation">Installation</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="issue-description">Description *</label>
+                        <textarea id="issue-description" name="description" class="form-control textarea" required
+                                  placeholder="Detailed description of the issue. Include steps to reproduce for bugs."></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reporter-name">Your Name</label>
+                            <input type="text" id="reporter-name" name="reporter_name" class="form-control" 
+                                   placeholder="Your name (optional)">
+                        </div>
+                        <div class="form-group">
+                            <label for="reporter-email">Your Email</label>
+                            <input type="email" id="reporter-email" name="reporter_email" class="form-control" 
+                                   placeholder="your.email@example.com (optional)">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="environment-info">Environment Information</label>
+                        <textarea id="environment-info" name="environment" class="form-control" rows="3"
+                                  placeholder="OS, Browser, Soblend Terminal version, etc."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="steps-reproduce">Steps to Reproduce (for bugs)</label>
+                        <textarea id="steps-reproduce" name="steps_reproduce" class="form-control" rows="4"
+                                  placeholder="1. Go to...&#10;2. Click on...&#10;3. See error..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="expected-behavior">Expected Behavior</label>
+                        <textarea id="expected-behavior" name="expected_behavior" class="form-control" rows="3"
+                                  placeholder="What should happen?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="actual-behavior">Actual Behavior</label>
+                        <textarea id="actual-behavior" name="actual_behavior" class="form-control" rows="3"
+                                  placeholder="What actually happens?"></textarea>
+                    </div>
+
+                    <div style="display: flex; gap: 15px; margin-top: 30px;">
+                        <button type="submit" class="btn">Submit Issue</button>
+                        <button type="reset" class="btn btn-secondary">Clear Form</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Analytics Tab -->
+        <div id="analytics" class="tab-content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="bugs-count">0</div>
+                    <div class="stat-label">Bug Reports</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="features-count">0</div>
+                    <div class="stat-label">Feature Requests</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="avg-resolution">0</div>
+                    <div class="stat-label">Avg Resolution (days)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="this-month">0</div>
+                    <div class="stat-label">Issues This Month</div>
+                </div>
+            </div>
+
+            <h2 style="color: #00ff00; margin: 30px 0 20px;">Issue Distribution</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <canvas id="priority-chart" width="200" height="200"></canvas>
+                    <div class="stat-label" style="margin-top: 15px;">By Priority</div>
+                </div>
+                <div class="stat-card">
+                    <canvas id="status-chart" width="200" height="200"></canvas>
+                    <div class="stat-label" style="margin-top: 15px;">By Status</div>
+                </div>
+                <div class="stat-card">
+                    <canvas id="type-chart" width="200" height="200"></canvas>
+                    <div class="stat-label" style="margin-top: 15px;">By Type</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Issue Detail Modal -->
+    <div id="issue-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Issue Details</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modal-body">
+                <!-- Issue details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let allIssues = [];
+        let filteredIssues = [];
+
+        // Tab switching functionality
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabName = btn.dataset.tab;
+                
+                // Update active button
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Update active tab
+                document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+                document.getElementById(tabName).classList.add('active');
+                
+                // Load tab-specific data
+                loadTabData(tabName);
+            });
+        });
+
+        // Load data based on active tab
+        function loadTabData(tabName) {
+            switch(tabName) {
+                case 'dashboard':
+                    loadDashboard();
+                    break;
+                case 'issues':
+                    loadAllIssues();
+                    break;
+                case 'analytics':
+                    loadAnalytics();
+                    break;
+            }
+        }
+
+        // Load dashboard data
+        async function loadDashboard() {
+            try {
+                const response = await fetch('api/dashboard.php');
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateDashboardStats(data.stats);
+                    displayRecentIssues(data.recent_issues);
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                document.getElementById('recent-issues').innerHTML = 
+                    '<div class="error">Error loading dashboard data</div>';
+            }
+        }
+
+        // Update dashboard statistics
+        function updateDashboardStats(stats) {
+            document.getElementById('total-issues').textContent = stats.total || 0;
+            document.getElementById('open-issues').textContent = stats.open || 0;
+            document.getElementById('resolved-issues').textContent = stats.resolved || 0;
+            document.getElementById('high-priority').textContent = stats.high_priority || 0;
+        }
+
+        // Display recent issues
+        function displayRecentIssues(issues) {
+            const container = document.getElementById('recent-issues');
+            
+            if (!issues || issues.length === 0) {
+                container.innerHTML = '<div class="loading">No recent issues found</div>';
+                return;
+            }
+            
+            container.innerHTML = issues.map(issue => createIssueCard(issue)).join('');
+        }
+
+        // Load all issues
+        async function loadAllIssues() {
+            try {
+                const response = await fetch('api/issues.php');
+                const data = await response.json();
+                
+                if (data.success) {
+                    allIssues = data.issues;
+                    filteredIssues = [...allIssues];
+                    displayIssues(filteredIssues);
+                }
+            } catch (error) {
+                console.error('Error loading issues:', error);
+                document.getElementById('all-issues').innerHTML = 
+                    '<div class="error">Error loading issues</div>';
+            }
+        }
+
+        // Display issues
+        function displayIssues(issues) {
+            const container = document.getElementById('all-issues');
+            
+            if (!issues || issues.length === 0) {
+                container.innerHTML = '<div class="loading">No issues found</div>';
+                return;
+            }
+            
+            container.innerHTML = issues.map(issue => createIssueCard(issue)).join('');
+        }
+
+        // Create issue card HTML
+        function createIssueCard(issue) {
+            const statusClass = `status-${issue.status.replace(' ', '-')}`;
+            const priorityClass = `priority-${issue.priority}`;
+            
+            return `
+                <div class="issue-card" onclick="viewIssue(${issue.id})">
+                    <div class="issue-header">
+                        <div>
+                            <div class="issue-title">#${issue.id} ${issue.title}</div>
+                            <div class="issue-meta">
+                                <span>📅 ${formatDate(issue.created_at)}</span>
+                                <span>👤 ${issue.reporter_name || 'Anonymous'}</span>
+                                <span>🏷️ ${issue.type}</span>
+                                <span class="${priorityClass}">🔥 ${issue.priority}</span>
+                            </div>
+                        </div>
+                        <div class="issue-status ${statusClass}">${issue.status}</div>
+                    </div>
+                    <div class="issue-description">
+                        ${truncateText(issue.description, 150)}
+                    </div>
+                    <div class="issue-actions">
+                        <button class="btn btn-small" onclick="event.stopPropagation(); viewIssue(${issue.id})">
+                            View Details
+                        </button>
+                        <button class="btn btn-small btn-secondary" onclick="event.stopPropagation(); updateStatus(${issue.id})">
+                            Update Status
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Search and filter functionality
+        document.getElementById('search-input').addEventListener('input', filterIssues);
+        document.getElementById('status-filter').addEventListener('change', filterIssues);
+        document.getElementById('priority-filter').addEventListener('change', filterIssues);
+        document.getElementById('type-filter').addEventListener('change', filterIssues);
+
+        function filterIssues() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const statusFilter = document.getElementById('status-filter').value;
+            const priorityFilter = document.getElementById('priority-filter').value;
+            const typeFilter = document.getElementById('type-filter').value;
+            
+            filteredIssues = allIssues.filter(issue => {
+                const matchesSearch = issue.title.toLowerCase().includes(searchTerm) ||
+                                    issue.description.toLowerCase().includes(searchTerm);
+                const matchesStatus = !statusFilter || issue.status === statusFilter;
+                const matchesPriority = !priorityFilter || issue.priority === priorityFilter;
+                const matchesType = !typeFilter || issue.type === typeFilter;
+                
+                return matchesSearch && matchesStatus && matchesPriority && matchesType;
+            });
+            
+            displayIssues(filteredIssues);
+        }
+
+        // Form submission
+        document.getElementById('issue-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            
+            submitBtn.textContent = 'Submitting...';
+            submitBtn.disabled = true;
+            
+            try {
+                const response = await fetch('api/create_issue.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('Issue submitted successfully! ID: #' + data.issue_id, 'success');
+                    e.target.reset();
+                    
+                    // Refresh dashboard if on dashboard tab
+                    if (document.querySelector('.tab-btn.active').dataset.tab === 'dashboard') {
+                        loadDashboard();
+                    }
+                } else {
+                    showMessage('Error: ' + data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error submitting issue:', error);
+                showMessage('Error submitting issue. Please try again.', 'error');
+            } finally {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+                // Show message
+        function showMessage(message, type) {
+            const container = document.getElementById('message-container');
+            container.innerHTML = `<div class="${type}">${message}</div>`;
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+
+        // View issue details
+        async function viewIssue(issueId) {
+            try {
+                const response = await fetch(`api/issue_details.php?id=${issueId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayIssueModal(data.issue);
+                } else {
+                    alert('Error loading issue details');
+                }
+            } catch (error) {
+                console.error('Error loading issue details:', error);
+                alert('Error loading issue details');
+            }
+        }
+
+        // Display issue in modal
+        function displayIssueModal(issue) {
+            const modalBody = document.getElementById('modal-body');
+            const statusClass = `status-${issue.status.replace(' ', '-')}`;
+            const priorityClass = `priority-${issue.priority}`;
+            
+            modalBody.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <h3 style="color: #00ff00; margin-bottom: 10px;">#${issue.id} ${issue.title}</h3>
+                    <div style="display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap;">
+                        <span class="issue-status ${statusClass}">${issue.status}</span>
+                        <span style="color: #ccc;">Type: ${issue.type}</span>
+                        <span class="${priorityClass}">Priority: ${issue.priority}</span>
+                        <span style="color: #ccc;">Component: ${issue.component || 'N/A'}</span>
+                    </div>
+                    <div style="color: #888; margin-bottom: 20px;">
+                        <span>Created: ${formatDate(issue.created_at)}</span> | 
+                        <span>Reporter: ${issue.reporter_name || 'Anonymous'}</span>
+                        ${issue.reporter_email ? ` (${issue.reporter_email})` : ''}
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <h4 style="color: #00ff00; margin-bottom: 10px;">Description</h4>
+                    <div style="background: #2a2a2a; padding: 15px; border-radius: 8px; color: #e0e0e0;">
+                        ${issue.description.replace(/\n/g, '<br>')}
+                    </div>
+                </div>
+                
+                ${issue.steps_reproduce ? `
+                <div style="margin-bottom: 20px;">
+                    <h4 style="color: #00ff00; margin-bottom: 10px;">Steps to Reproduce</h4>
+                    <div style="background: #2a2a2a; padding: 15px; border-radius: 8px; color: #e0e0e0;">
+                        ${issue.steps_reproduce.replace(/\n/g, '<br>')}
+                    </div>
+                </div>
+                ` : ''}
+                
+                ${issue.expected_behavior ? `
+                <div style="margin-bottom: 20px;">
+                    <h4 style="color: #00ff00; margin-bottom: 10px;">Expected Behavior</h4>
+                    <div style="background: #2a2a2a; padding: 15px; border-radius: 8px; color: #e0e0e0;">
+                        ${issue.expected_behavior.replace(/\n/g, '<br>')}
+                    </div>
+                </div>
+                ` : ''}
+                
+                ${issue.actual_behavior ? `
+                <div style="margin-bottom: 20px;">
+                    <h4 style="color: #00ff00; margin-bottom: 10px;">Actual Behavior</h4>
+                    <div style="background: #2a2a2a; padding: 15px; border-radius: 8px; color: #e0e0e0;">
+                        ${issue.actual_behavior.replace(/\n/g, '<br>')}
+                    </div>
+                </div>
+                ` : ''}
+                
+                ${issue.environment ? `
+                <div style="margin-bottom: 20px;">
+                    <h4 style="color: #00ff00; margin-bottom: 10px;">Environment</h4>
+                    <div style="background: #2a2a2a; padding: 15px; border-radius: 8px; color: #e0e0e0;">
+                        ${issue.environment.replace(/\n/g, '<br>')}
+                    </div>
+                </div>
+                ` : ''}
+                
+                <div style="display: flex; gap: 10px; margin-top: 25px;">
+                    <button class="btn btn-small" onclick="updateIssueStatus(${issue.id})">Update Status</button>
+                    <button class="btn btn-small btn-secondary" onclick="closeModal()">Close</button>
+                </div>
+            `;
+            
+            document.getElementById('issue-modal').classList.add('active');
+        }
+
+        // Update issue status
+        async function updateIssueStatus(issueId) {
+            const newStatus = prompt('Enter new status (open, in-progress, resolved, closed):');
+            
+            if (!newStatus) return;
+            
+            try {
+                const response = await fetch('api/update_status.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        issue_id: issueId,
+                        status: newStatus
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Status updated successfully!');
+                    closeModal();
+                    
+                    // Refresh current tab data
+                    const activeTab = document.querySelector('.tab-btn.active').dataset.tab;
+                    loadTabData(activeTab);
+                } else {
+                    alert('Error updating status: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error updating status:', error);
+                alert('Error updating status');
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('issue-modal').classList.remove('active');
+        }
+
+        // Load analytics
+        async function loadAnalytics() {
+            try {
+                const response = await fetch('api/analytics.php');
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateAnalyticsStats(data.stats);
+                    drawCharts(data.charts);
+                }
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+            }
+        }
+
+        // Update analytics statistics
+        function updateAnalyticsStats(stats) {
+            document.getElementById('bugs-count').textContent = stats.bugs || 0;
+            document.getElementById('features-count').textContent = stats.features || 0;
+            document.getElementById('avg-resolution').textContent = stats.avg_resolution || 0;
+            document.getElementById('this-month').textContent = stats.this_month || 0;
+        }
+
+        // Draw charts (simple canvas-based charts)
+        function drawCharts(chartData) {
+            drawPieChart('priority-chart', chartData.priority, {
+                'high': '#dc3545',
+                'medium': '#ffc107',
+                'low': '#28a745',
+                'critical': '#ff0000'
+            });
+            
+            drawPieChart('status-chart', chartData.status, {
+                'open': '#ffc107',
+                'in-progress': '#007bff',
+                'resolved': '#28a745',
+                'closed': '#6c757d'
+            });
+            
+            drawPieChart('type-chart', chartData.type, {
+                'bug': '#dc3545',
+                'feature': '#007bff',
+                'enhancement': '#28a745',
+                'documentation': '#6f42c1',
+                'security': '#fd7e14',
+                'performance': '#20c997'
+            });
+        }
+
+        // Simple pie chart function
+        function drawPieChart(canvasId, data, colors) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = Math.min(centerX, centerY) - 20;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Calculate total
+            const total = Object.values(data).reduce((sum, value) => sum + value, 0);
+            
+            if (total === 0) {
+                // Draw empty state
+                ctx.fillStyle = '#333';
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                ctx.fillStyle = '#666';
+                ctx.font = '14px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('No Data', centerX, centerY);
+                return;
+            }
+            
+            // Draw pie slices
+            let currentAngle = -Math.PI / 2; // Start from top
+            
+            Object.entries(data).forEach(([key, value]) => {
+                const sliceAngle = (value / total) * 2 * Math.PI;
+                
+                // Draw slice
+                ctx.fillStyle = colors[key] || '#666';
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+                ctx.closePath();
+                ctx.fill();
+                
+                // Draw label
+                if (value > 0) {
+                    const labelAngle = currentAngle + sliceAngle / 2;
+                    const labelX = centerX + Math.cos(labelAngle) * (radius * 0.7);
+                    const labelY = centerY + Math.sin(labelAngle) * (radius * 0.7);
+                    
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 12px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(value.toString(), labelX, labelY);
+                }
+                
+                currentAngle += sliceAngle;
+            });
+        }
+
+        // Utility functions
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function truncateText(text, maxLength) {
+            if (text.length <= maxLength) return text;
+            return text.substring(0, maxLength) + '...';
+        }
+
+        // Auto-fill environment info
+        function autoFillEnvironment() {
+            const envInfo = document.getElementById('environment-info');
+            if (envInfo.value === '') {
+                const info = [
+                    `OS: ${navigator.platform}`,
+                    `Browser: ${navigator.userAgent.split(' ').pop()}`,
+                    `Screen: ${screen.width}x${screen.height}`,
+                    `Language: ${navigator.language}`,
+                    `Timestamp: ${new Date().toISOString()}`
+                ].join('\n');
+                
+                envInfo.value = info;
+            }
+        }
+
+        // Add event listener for environment auto-fill
+        document.getElementById('environment-info').addEventListener('focus', autoFillEnvironment);
+
+        // Close modal when clicking outside
+        document.getElementById('issue-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'issue-modal') {
+                closeModal();
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Escape to close modal
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+            
+            // Ctrl+N to create new issue
+            if (e.ctrlKey && e.key === 'n') {
+                e.preventDefault();
+                document.querySelector('[data-tab="create"]').click();
+            }
+            
+            // Ctrl+F to focus search
+            if (e.ctrlKey && e.key === 'f') {
+                e.preventDefault();
+                const searchInput = document.getElementById('search-input');
+                if (searchInput) {
+                    searchInput.focus();
+                }
+            }
+        });
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load initial dashboard data
+            loadDashboard();
+            
+            // Set up periodic refresh (every 30 seconds)
+            setInterval(() => {
+                const activeTab = document.querySelector('.tab-btn.active').dataset.tab;
+                if (activeTab === 'dashboard') {
+                    loadDashboard();
+                }
+            }, 30000);
+            
+            console.log('🐛 Soblend Terminal Issue Tracker initialized');
+        });
+
+        // Service worker registration (for offline support)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch(registrationError => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>
+
